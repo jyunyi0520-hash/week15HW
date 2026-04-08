@@ -7,11 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <script>
-    // 確保 Google GIS 載入後正確觸發
-    function gisLoaded() { if(window.initGis) window.initGis(); }
-  </script>
+  <script>function gisLoaded() { if(window.initGis) window.initGis(); }</script>
   <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
 </head>
 
@@ -31,18 +27,11 @@
     <section class="card form-section">
       <h2 class="card-title"><i class="fa-solid fa-seedling"></i> 記下一筆新帳務</h2>
       <form id="recordForm" class="cute-form">
-        <div class="input-group">
-          <label>📅 收支日期</label>
-          <input type="date" id="fDate" required />
-        </div>
-        
-        <div class="input-group">
-          <label>🏢 公司 / 帳戶 (可打字新增或選擇)</label>
-          <input type="text" id="fAccount" list="accountList" placeholder="例如：A公司-玉山銀行" required autocomplete="off" />
-          <datalist id="accountList"></datalist>
-        </div>
-
         <div class="input-row">
+          <div class="input-group">
+            <label>📅 收支日期</label>
+            <input type="date" id="fDate" required />
+          </div>
           <div class="input-group">
             <label>🏷️ 類型</label>
             <select id="fType" required>
@@ -50,10 +39,24 @@
               <option value="收入">💰 收入</option>
             </select>
           </div>
+        </div>
+        
+        <div class="input-group">
+          <label>🏢 公司 / 帳戶</label>
+          <input type="text" id="fAccount" list="accountList" placeholder="例如：貝佳" required autocomplete="off" />
+          <datalist id="accountList"></datalist>
+        </div>
+
+        <div class="input-row">
           <div class="input-group">
-            <label>📂 項目 / 分類</label>
-            <input type="text" id="fItem" list="itemList" placeholder="例如：會計記帳費" required autocomplete="off" />
-            <datalist id="itemList"></datalist>
+            <label>📂 分類</label>
+            <input type="text" id="fCategory" list="categoryList" placeholder="例如：稅金" required autocomplete="off" />
+            <datalist id="categoryList"></datalist>
+          </div>
+          <div class="input-group">
+            <label>📋 細項</label>
+            <input type="text" id="fSubItem" list="subItemList" placeholder="例如：5%" required autocomplete="off" />
+            <datalist id="subItemList"></datalist>
           </div>
         </div>
 
@@ -64,7 +67,7 @@
 
         <div class="input-group">
           <label>📝 備註說明</label>
-          <input type="text" id="fNote" placeholder="例如：11-12月記帳費" />
+          <input type="text" id="fNote" placeholder="例如：3月稅金預存" />
         </div>
 
         <button type="submit" id="btnSubmit" class="btn btn-submit" disabled>
@@ -77,18 +80,18 @@
       <div class="card filter-card">
         <h2 class="card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> 一鍵財務分析</h2>
         <div class="filter-controls">
-          <select id="filterAccount"><option value="ALL">🏢 全部公司/帳戶</option></select>
-          <select id="filterItem"><option value="ALL">📂 全部項目</option></select>
+          <select id="filterAccount"><option value="ALL">🏢 全部帳戶</option></select>
+          <select id="filterCategory"><option value="ALL">📂 全部分類</option></select>
         </div>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card box-income">
-          <div class="stat-title">篩選項目總收入</div>
+          <div class="stat-title">篩選總收入</div>
           <div class="stat-value" id="dispIncome">0</div>
         </div>
         <div class="stat-card box-expense">
-          <div class="stat-title">篩選項目總支出</div>
+          <div class="stat-title">篩選總支出</div>
           <div class="stat-value" id="dispExpense">0</div>
         </div>
         <div class="stat-card box-balance">
@@ -111,7 +114,8 @@
             <tr>
               <th>日期</th>
               <th>公司/帳戶</th>
-              <th>項目</th>
+              <th>分類</th>
+              <th>細項</th>
               <th class="txt-right">收入</th>
               <th class="txt-right">支出</th>
               <th class="txt-right">餘額</th>
@@ -119,7 +123,7 @@
             </tr>
           </thead>
           <tbody id="recordsTbody">
-            <tr><td colspan="7" class="empty-msg">資料載入中...</td></tr>
+            <tr><td colspan="8" class="empty-msg">資料載入中...</td></tr>
           </tbody>
         </table>
       </div>
