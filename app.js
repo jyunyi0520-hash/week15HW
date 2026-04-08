@@ -1,5 +1,5 @@
 /* =========================
-   配置：已更新為您的新 ID 與結構
+   配置：Google Sheets 參數
 ========================= */
 const CONFIG = {
   CLIENT_ID: "760923439271-cechi85qk63kpq5ts1e3h0n0v55249s0.apps.googleusercontent.com",
@@ -67,10 +67,9 @@ async function callSheetsAPI(endpoint, method = "GET", body = null) {
   return res.json();
 }
 
-// 同時讀取「公司帳務」與「參數」表
+// 讀取資料
 async function fetchData() {
   try {
-    // 讀取紀錄 (A:H 共8欄)
     const dataRes = await callSheetsAPI(`values/${encodeURIComponent(CONFIG.SHEET_RECORDS)}!A:H`);
     const rows = dataRes.values || [];
     
@@ -85,7 +84,6 @@ async function fetchData() {
       note: r[7] || ""
     }));
 
-    // 讀取參數 (A:C 共3欄：帳戶、分類、細項)
     let paramAccounts = new Set();
     let paramCategories = new Set();
     let paramSubItems = new Set();
@@ -98,9 +96,8 @@ async function fetchData() {
         if(r[1]) paramCategories.add(r[1].trim());
         if(r[2]) paramSubItems.add(r[2].trim());
       });
-    } catch(e) { console.log("參數表讀取失敗或不存在，將使用歷史紀錄建立選單"); }
+    } catch(e) { console.log("參數表讀取失敗"); }
 
-    // 把歷史紀錄裡出現過的名詞也加進提示中
     allRecords.forEach(r => {
       if(r.account) paramAccounts.add(r.account);
       if(r.category) paramCategories.add(r.category);
@@ -121,7 +118,6 @@ function updateDatalists(accounts, categories, subItems) {
   $("categoryList").innerHTML = categories.map(v => `<option value="${v}">`).join("");
   $("subItemList").innerHTML = subItems.map(v => `<option value="${v}">`).join("");
 
-  // 更新分析看板的下拉選單
   $("filterAccount").innerHTML = `<option value="ALL">🏢 全部帳戶</option>` + accounts.map(a => `<option value="${a}">${a}</option>`).join("");
   $("filterCategory").innerHTML = `<option value="ALL">📂 全部分類</option>` + categories.map(c => `<option value="${c}">${c}</option>`).join("");
 }
@@ -133,7 +129,6 @@ function updateDashboard() {
   let filtered = allRecords;
   if (selAcc !== "ALL") filtered = filtered.filter(r => r.account === selAcc);
   
-  // 計算當前餘額 (抓取該帳戶的最後一筆紀錄)
   let currentBalance = "-";
   if (selAcc !== "ALL") {
     const accRecords = allRecords.filter(r => r.account === selAcc).sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -143,7 +138,6 @@ function updateDashboard() {
   }
   $("dispBalance").textContent = currentBalance;
 
-  // 篩選分類
   if (selCat !== "ALL") filtered = filtered.filter(r => r.category === selCat);
   
   const totalInc = filtered.reduce((sum, r) => sum + r.income, 0);
@@ -159,14 +153,14 @@ function updateDashboard() {
 function renderTable(data) {
   const html = data.sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 50).map(r => `
     <tr>
-      <td>${r.date}</td>
-      <td>${r.account}</td>
-      <td>${r.category}</td>
-      <td>${r.subItem}</td>
+      <td title="${r.date}">${r.date}</td>
+      <td title="${r.account}">${r.account}</td>
+      <td title="${r.category}">${r.category}</td>
+      <td title="${r.subItem}">${r.subItem}</td>
       <td class="txt-right font-bold" style="color:#2a9d8f">${r.income > 0 ? r.income.toLocaleString() : '-'}</td>
       <td class="txt-right font-bold" style="color:#e76f51">${r.expense > 0 ? r.expense.toLocaleString() : '-'}</td>
       <td class="txt-right font-bold">${r.balance.toLocaleString()}</td>
-      <td><small>${r.note}</small></td>
+      <td title="${r.note}"><small>${r.note}</small></td>
     </tr>
   `).join("");
   $("recordsTbody").innerHTML = html || `<tr><td colspan="8" class="empty-msg">尚未有紀錄喔 🍃</td></tr>`;
@@ -180,7 +174,6 @@ function renderChart(data) {
   for (let i = 5; i >= 0; i--) {
     const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
     const mStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    // 支援 yyyy/mm/dd 或 yyyy-mm-dd 格式
     const mStrAlt = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}`;
     const mStrAlt2 = `${d.getFullYear()}/${d.getMonth() + 1}`; 
     
@@ -192,6 +185,7 @@ function renderChart(data) {
   }
 
   if (chartInstance) chartInstance.destroy();
+  
   chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -201,7 +195,11 @@ function renderChart(data) {
         { label: '支出 💸', data: expData, backgroundColor: '#FFB7B2', borderRadius: 5 }
       ]
     },
-    options: { responsive: true, maintainAspectRatio: false }
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
   });
 }
 
@@ -220,18 +218,14 @@ async function submitRecord() {
   const income = type === "收入" ? amount : "";
   const expense = type === "支出" ? amount : "";
 
-  // 自動計算餘額
   const accRecords = allRecords.filter(r => r.account === account).sort((a,b) => new Date(a.date) - new Date(b.date));
   let lastBalance = accRecords.length > 0 ? accRecords[accRecords.length - 1].balance : 0;
   let newBalance = type === "收入" ? lastBalance + amount : lastBalance - amount;
 
-  // 注意：這裡寫入 8 個欄位 (A~H)
   const row = [date, account, category, subItem, income, expense, newBalance, note];
 
   try {
     await callSheetsAPI(`values/${encodeURIComponent(CONFIG.SHEET_RECORDS)}!A:H:append?valueInputOption=USER_ENTERED`, "POST", { values: [row] });
-    
-    // 清空金額與備註，保留日期等欄位方便連續記帳
     $("fAmount").value = ""; 
     $("fNote").value = "";
     
