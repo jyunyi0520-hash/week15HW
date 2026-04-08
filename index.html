@@ -102,7 +102,9 @@
 
       <div class="card chart-card">
         <h3 class="chart-title"><i class="fa-solid fa-chart-line"></i> 近六個月趨勢圖</h3>
-        <canvas id="trendChart"></canvas>
+        <div class="chart-wrapper">
+          <canvas id="trendChart"></canvas>
+        </div>
       </div>
     </section>
 
@@ -112,14 +114,14 @@
         <table class="cute-table">
           <thead>
             <tr>
-              <th>日期</th>
-              <th>公司/帳戶</th>
-              <th>分類</th>
-              <th>細項</th>
-              <th class="txt-right">收入</th>
-              <th class="txt-right">支出</th>
-              <th class="txt-right">餘額</th>
-              <th>備註</th>
+              <th class="col-date">日期</th>
+              <th class="col-account">帳戶</th>
+              <th class="col-cat">分類</th>
+              <th class="col-sub">細項</th>
+              <th class="col-money txt-right">收入</th>
+              <th class="col-money txt-right">支出</th>
+              <th class="col-money txt-right">餘額</th>
+              <th class="col-note">備註</th>
             </tr>
           </thead>
           <tbody id="recordsTbody">
