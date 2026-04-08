@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🐾 企業萌帳本 | 輕鬆掌握公司財務</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script>
+    // 確保 Google GIS 載入後正確觸發
+    function gisLoaded() { if(window.initGis) window.initGis(); }
+  </script>
+  <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="container header-flex">
+      <h1 class="logo"><i class="fa-solid fa-briefcase"></i> 企業萌帳本</h1>
+      <div class="auth-area">
+        <span id="statusText" class="status-msg">等待魔法連線...</span>
+        <button id="btnSignIn" class="btn btn-primary"><i class="fa-brands fa-google"></i> 登入</button>
+        <button id="btnSignOut" class="btn btn-outline hidden"><i class="fa-solid fa-sign-out-alt"></i> 登出</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-layout">
+    <section class="card form-section">
+      <h2 class="card-title"><i class="fa-solid fa-seedling"></i> 記下一筆新帳務</h2>
+      <form id="recordForm" class="cute-form">
+        <div class="input-group">
+          <label>📅 收支日期</label>
+          <input type="date" id="fDate" required />
+        </div>
+        
+        <div class="input-group">
+          <label>🏢 公司 / 帳戶 (可打字新增或選擇)</label>
+          <input type="text" id="fAccount" list="accountList" placeholder="例如：A公司-玉山銀行" required autocomplete="off" />
+          <datalist id="accountList"></datalist>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label>🏷️ 類型</label>
+            <select id="fType" required>
+              <option value="支出">💸 支出</option>
+              <option value="收入">💰 收入</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>📂 項目 / 分類</label>
+            <input type="text" id="fItem" list="itemList" placeholder="例如：會計記帳費" required autocomplete="off" />
+            <datalist id="itemList"></datalist>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>🪙 金額</label>
+          <input type="number" id="fAmount" min="0" step="1" placeholder="輸入金額..." required />
+        </div>
+
+        <div class="input-group">
+          <label>📝 備註說明</label>
+          <input type="text" id="fNote" placeholder="例如：11-12月記帳費" />
+        </div>
+
+        <button type="submit" id="btnSubmit" class="btn btn-submit" disabled>
+          <i class="fa-solid fa-paper-plane"></i> 送出進帳本
+        </button>
+      </form>
+    </section>
+
+    <section class="dashboard-section">
+      <div class="card filter-card">
+        <h2 class="card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> 一鍵財務分析</h2>
+        <div class="filter-controls">
+          <select id="filterAccount"><option value="ALL">🏢 全部公司/帳戶</option></select>
+          <select id="filterItem"><option value="ALL">📂 全部項目</option></select>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card box-income">
+          <div class="stat-title">篩選項目總收入</div>
+          <div class="stat-value" id="dispIncome">0</div>
+        </div>
+        <div class="stat-card box-expense">
+          <div class="stat-title">篩選項目總支出</div>
+          <div class="stat-value" id="dispExpense">0</div>
+        </div>
+        <div class="stat-card box-balance">
+          <div class="stat-title">該帳戶當前餘額</div>
+          <div class="stat-value" id="dispBalance">-</div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <h3 class="chart-title"><i class="fa-solid fa-chart-line"></i> 近六個月趨勢圖</h3>
+        <canvas id="trendChart"></canvas>
+      </div>
+    </section>
+
+    <section class="card table-section">
+      <h2 class="card-title"><i class="fa-solid fa-list-ul"></i> 最近帳務明細</h2>
+      <div class="table-responsive">
+        <table class="cute-table">
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>公司/帳戶</th>
+              <th>項目</th>
+              <th class="txt-right">收入</th>
+              <th class="txt-right">支出</th>
+              <th class="txt-right">餘額</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTbody">
+            <tr><td colspan="7" class="empty-msg">資料載入中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">
+    <div class="toast-icon">✨</div>
+    <div id="toastMsg" class="toast-msg-text">記帳成功！</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
