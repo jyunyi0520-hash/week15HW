@@ -24,19 +24,19 @@ body {
 
 /* Header */
 .app-header { background: var(--card-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.03); padding: 15px 0; margin-bottom: 25px; backdrop-filter: blur(5px); }
-.header-flex { display: flex; justify-content: space-between; align-items: center; }
+.header-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .logo { font-size: 1.6rem; color: #ff8e9b; }
-.auth-area { display: flex; align-items: center; gap: 15px; }
+.auth-area { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
 .status-msg { font-size: 0.85rem; color: var(--text-light); }
 .hidden { display: none !important; }
 
-/* Layout */
+/* Layout - 電腦版預設雙欄 */
 .main-layout { display: grid; grid-template-columns: 360px 1fr; gap: 25px; }
 .table-section { grid-column: 1 / -1; }
 .card { background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: 0 8px 25px rgba(189, 169, 196, 0.15); border: 1px solid #fff; }
 .card-title { font-size: 1.1rem; margin-bottom: 20px; color: #786485; display: flex; align-items: center; gap: 8px; }
 
-/* Form 防破版 */
+/* Form */
 .cute-form { display: flex; flex-direction: column; gap: 15px; width: 100%; }
 .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .input-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -63,14 +63,14 @@ input:focus, select:focus { outline: none; border-color: var(--primary); box-sha
 .stat-title { font-size: 0.8rem; color: var(--text-light); margin-bottom: 8px; font-weight: bold; }
 .stat-value { font-size: 1.5rem; font-weight: 900; }
 
-/* ！！！修復圖表無限放大的關鍵！！！ */
+/* 圖表區域 */
 .chart-card { display: flex; flex-direction: column; flex-grow: 1; padding: 20px; }
 .chart-title { font-size: 1rem; color: var(--text-light); margin-bottom: 10px; text-align: center; }
 .chart-wrapper { position: relative; height: 300px; width: 100%; } 
 
-/* Table 固定欄位大小 */
-.table-responsive { overflow-x: auto; width: 100%; }
-.cute-table { width: 100%; border-collapse: collapse; min-width: 900px; table-layout: fixed; }
+/* Table */
+.table-responsive { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+.cute-table { width: 100%; border-collapse: collapse; min-width: 850px; table-layout: fixed; }
 .cute-table th { padding: 12px; text-align: left; font-size: 0.9rem; color: var(--text-light); border-bottom: 2px solid #eee; background: #fafafa; }
 .cute-table td { padding: 12px 12px; font-size: 0.95rem; border-bottom: 1px solid #f5f5f5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cute-table tr:hover td { background: #fdfaf6; }
@@ -78,13 +78,13 @@ input:focus, select:focus { outline: none; border-color: var(--primary); box-sha
 .font-bold { font-weight: bold; }
 .empty-msg { text-align: center; padding: 30px; color: var(--text-light); }
 
-/* 設定各欄位寬度比例 */
+/* Table 欄位寬度比例 */
 .col-date { width: 12%; }
-.col-account { width: 15%; }
-.col-cat { width: 12%; }
+.col-account { width: 14%; }
+.col-cat { width: 11%; }
 .col-sub { width: 13%; }
 .col-money { width: 12%; }
-.col-note { width: 12%; } 
+.col-note { width: 14%; } 
 
 /* Toast */
 .toast {
@@ -97,7 +97,31 @@ input:focus, select:focus { outline: none; border-color: var(--primary); box-sha
 .toast.show { bottom: 40px; }
 .toast-icon { font-size: 1.5rem; }
 
-@media (max-width: 900px) {
-  .main-layout { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr; }
+/* ==========================================================
+   📱 RWD 手機與平板適配區域 (核心修改區域)
+   ========================================================== */
+@media (max-width: 768px) {
+  /* 容器與版面佈局縮減間距 */
+  .container { padding: 0 10px; }
+  .main-layout { grid-template-columns: 1fr; gap: 15px; } /* 改為單欄直排 */
+  
+  /* 卡片內邊距縮小，騰出螢幕空間 */
+  .card { padding: 15px; border-radius: 15px; }
+  
+  /* 標題與按鈕微調 */
+  .app-header { padding: 10px 0; margin-bottom: 15px; }
+  .logo { font-size: 1.3rem; }
+  .btn { padding: 8px 16px; font-size: 0.9rem; }
+  
+  /* 表單與分析看板單欄化 */
+  .input-row { grid-template-columns: 1fr; gap: 10px; } /* 原本左右並排的輸入框改為上下 */
+  .filter-controls { grid-template-columns: 1fr; gap: 10px; } /* 篩選器改為上下 */
+  .stats-grid { grid-template-columns: 1fr; gap: 10px; } /* 三個數據卡片改為上下 */
+  
+  /* 圖表高度微調，避免佔據整個手機畫面 */
+  .chart-wrapper { height: 250px; }
+  
+  /* 表格文字在手機上略微縮小 */
+  .cute-table th { padding: 10px; font-size: 0.85rem; }
+  .cute-table td { padding: 10px; font-size: 0.9rem; }
 }
