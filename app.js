@@ -3,7 +3,7 @@
 ========================= */
 const CONFIG = {
   CLIENT_ID: "760923439271-cechi85qk63kpq5ts1e3h0n0v55249s0.apps.googleusercontent.com",
-  SPREADSHEET_ID: "1MCA5A67CJqChoBg1xG5fEZF6kJq1vb8BAnfBe7FimZU",
+  SPREADSHEET_ID: "151gNjbFwYjTfA7fy_WjXAnCymySYmLy-INBJuQjfdMk",
   SHEET_NAME: "公司帳務", // 請確認 Google 試算表中有這個名稱的工作表
   SCOPES: "https://www.googleapis.com/auth/spreadsheets"
 };
